@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kokaflex Renting</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #0b0b0f;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    /* HERO */
+    .hero {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: radial-gradient(circle at top, #1f2937, #000);
+      text-align: center;
+      animation: fadeIn 1.5s ease;
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, #22c55e, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .scroll {
+      position: absolute;
+      bottom: 30px;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    section { padding: 110px 8%; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 40px;
+    }
+
+    .card {
+      background: #111;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+      transform: translateY(90px);
+      opacity: 0;
+      transition: all 1.2s ease;
+    }
+
+    .card.show { transform: translateY(0); opacity: 1; }
+
+    .card img { width: 100%; height: 230px; object-fit: cover; }
+
+    .card-content { padding: 28px; }
+
+    .card h3 { font-size: 1.4rem; margin-bottom: 10px; }
+    .card p { font-size: 0.95rem; opacity: 0.85; margin-bottom: 20px; }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 30px;
+      background: linear-gradient(90deg, #22c55e, #0ea5e9);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn:hover { transform: scale(1.08); box-shadow: 0 15px 40px rgba(34,197,94,0.5); }
+
+    /* MODAL */
+    .modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: none; align-items: center; justify-content: center;
+      z-index: 999;
+    }
+
+    .modal-box {
+      background: #121212;
+      padding: 40px;
+      border-radius: 22px;
+      max-width: 460px;
+      text-align: center;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .cards-logos {
+      display: flex; justify-content: center; gap: 12px; margin: 18px 0;
+    }
+
+    .cards-logos img { height: 28px; filter: brightness(0.9); }
+
+    footer {
+      padding: 50px 20px;
+      text-align: center;
+      background: #070707;
+      opacity: 0.75;
+      font-size: 0.9rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(25px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* EXTRA EFFECTS */
+    .glow {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(56,189,248,0.35), transparent 70%);
+      filter: blur(60px);
+      animation: float 8s infinite alternate;
+      z-index: 0;
+    }
+
+    @keyframes float {
+      from { transform: translateY(0); }
+      to { transform: translateY(-60px); }
+    }
+
+    .hero-content { position: relative; z-index: 2; }
+
+    .hero video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.15;
+      z-index: 1;
+    }
+
+    .card:hover img {
+      transform: scale(1.08);
+      transition: transform 0.6s ease;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(34,197,94,0.15);
+      color: #22c55e;
+      font-size: 0.75rem;
+      margin-bottom: 10px;
+    }
+
+    .floating-btn {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background: linear-gradient(90deg,#22c55e,#38bdf8);
+      padding: 14px 18px;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 20px 40px rgba(34,197,94,0.5);
+      z-index: 1000;
+    }
+
+    .floating-btn:hover { transform: scale(1.08); }
+
+</style>
+</head>
+<body>
+<!-- PAGE LOADER -->
+<div id="loader" style="position:fixed;inset:0;background:#050507;display:flex;align-items:center;justify-content:center;z-index:99999;">
+  <div style="font-size:1.4rem;font-weight:700;background:linear-gradient(90deg,#22c55e,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Kokaflex Loading…</div>
+</div>
+
+<!-- NAVBAR -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:10000;display:flex;justify-content:space-between;align-items:center;padding:14px 8%;background:rgba(5,5,7,0.6);backdrop-filter:blur(12px)">
+  <div style="font-weight:800;letter-spacing:1px">Kokaflex</div>
+  <div style="display:flex;gap:18px;font-size:0.9rem">
+    <a href="#services" style="color:#fff;text-decoration:none">Services</a>
+    <a href="#faq" style="color:#fff;text-decoration:none">FAQ</a>
+    <a href="#contact" style="color:#38bdf8;text-decoration:none">Contact</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <video autoplay muted loop>
+    <source src="https://cdn.cloudflare.steamstatic.com/steam/apps/256658589/movie480.mp4" type="video/mp4">
+  </video>
+  <div class="glow"></div>
+  <div class="hero-content">
+  <h1>Kokaflex Renting!</h1>
+  <p>The future of oxide survival island!</p>
+  <div class="scroll">Scroll ↓</div>
+  </div>
+</div>
+
+<section id="services">
+  <div class="cards">
+
+    <!-- OLD OXIDE -->
+    <div class="card">
+      <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/252490/ss_1c2d0d1eefee54f0c67626c74eb21699bbb0ef52.1920x1080.jpg" />
+      <div class="card-content">
+        <span class="badge">POPULAR</span>
+        <h3>Old Oxide Access</h3>
+        <p>Rust game old oxide access. Premium & limited.</p>
+        <a class="btn" onclick="openModal('old')">Buy</a>
+      </div>
+    </div>
+
+    <!-- BETA OXIDE -->
+    <div class="card">
+      <img src="https://www.mmogames.com/wp-content/uploads/2014/02/Rust-Screenshot-08.jpg" />
+      <div class="card-content">
+        <span class="badge">FREE</span>
+        <h3>Beta Oxide APKs</h3>
+        <p>Rust beta oxide. Free early access.</p>
+        <a class="btn" onclick="openModal('beta')">Buy</a>
+      </div>
+    </div>
+
+    <!-- TELEGRAM BOTS -->
+    <div class="card">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" />
+      <div class="card-content">
+        <span class="badge">CUSTOM</span>
+        <h3>Rent Telegram Bots</h3>
+        <p>Custom Rust bots, design & features you choose.</p>
+        <a class="btn" onclick="openModal('bot')">Buy</a>
+      </div>
+    </div>
+
+    <!-- WEBSITES -->
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085" />
+      <div class="card-content">
+        <h3>Rent Websites</h3>
+        <p>Rust-style websites. Custom scripts & design.</p>
+        <a class="btn" onclick="openModal('web')">Buy</a>
+      </div>
+    </div>
+
+    <!-- DEVELOPER -->
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1517433456452-f9633a875f6f" />
+      <div class="card-content">
+        <h3>Rent Developer</h3>
+        <p>Hire a developer. Coding & scripting.</p>
+        <a class="btn" onclick="openModal('dev')">Contact</a>
+      </div>
+    </div>
+
+    <!-- COMING SOON (LAST) -->
+    <div class="card">
+      <img src="https://www.gry-online.pl/galeria/galeria_duze3/261887084.jpg" />
+      <div class="card-content">
+        <h3>Coming Soon</h3>
+        <p>More Rust services loading…</p>
+        <a class="btn">Soon</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- STATS SECTION -->
+<section>
+  <div class="cards">
+    <div class="card show"><div class="card-content"><h3 id="stat1">0+</h3><p>Happy Clients</p></div></div>
+    <div class="card show"><div class="card-content"><h3 id="stat2">0+</h3><p>Rust Services</p></div></div>
+    <div class="card show"><div class="card-content"><h3 id="stat3">0+</h3><p>Weeks Online</p></div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section>
+  <h2 style="margin-bottom:30px">Why Choose Kokaflex?</h2>
+  <div class="cards">
+    <div class="card show"><div class="card-content"><h3>⚡ Fast Delivery</h3><p>Get access or services quickly after contact.</p></div></div>
+    <div class="card show"><div class="card-content"><h3>🛡️ Trusted</h3><p>Used by oxide survival island players.</p></div></div>
+    <div class="card show"><div class="card-content"><h3>🎨 Custom Work</h3><p>Design, bots, websites built exactly how you want.</p></div></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section>
+  <h2 style="margin-bottom:30px">What Players Say</h2>
+  <div class="cards">
+    <div class="card show"><div class="card-content"><p>“Best oxide access I’ve used. Fast & legit.”</p><b>– Rust Player</b></div></div>
+    <div class="card show"><div class="card-content"><p>“Telegram bot was exactly how I wanted it.”</p><b>– Server Owner</b></div></div>
+    <div class="card show"><div class="card-content"><p>“Professional design, worth the price.”</p><b>– Community Admin</b></div></div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section>
+  <h2 style="margin-bottom:30px">FAQ</h2>
+  <div class="card show"><div class="card-content"><h3>How do I buy?</h3><p>Contact us on Telegram until website payments are ready.</p></div></div>
+  <div class="card show"><div class="card-content"><h3>Are services safe?</h3><p>Yes, trusted oxide survival island community services.</p></div></div>
+</section>
+
+<div class="modal" id="modal"><div class="modal-box" id="modalBox"></div></div>
+
+<section id="contact" style="padding:80px 8%;text-align:center">
+  <h2>Contact & Support</h2>
+  <p style="margin:15px 0">Fast response on Telegram</p>
+  <a class="btn" href="https://t.me/miroslavkandic" target="_blank">Message on Telegram</a>
+</section>
+
+<footer>
+  <p><a href="privacy.html" style="color:#38bdf8;text-decoration:none;">Privacy Policy</a></p>
+  <p>Soon payments through website!</p>
+  <p>© 2025 Kokaflex Renting</p>
+</footer>
+
+<div class="floating-btn" onclick="openModal('dev')">Hire Developer</div>
+
+<script>
+// COUNTERS
+const animateCounter=(id,target)=>{let i=0;const el=document.getElementById(id);const int=setInterval(()=>{i++;el.innerText=i+'+';if(i>=target)clearInterval(int)},30)}
+window.addEventListener('load',()=>{animateCounter('stat1',120);animateCounter('stat2',15);animateCounter('stat3',40)})
+
+// CURSOR GLOW
+const glow=document.createElement('div');glow.style.cssText='position:fixed;width:80px;height:80px;border-radius:50%;background:rgba(56,189,248,0.25);pointer-events:none;filter:blur(30px);z-index:9999';document.body.appendChild(glow);document.addEventListener('mousemove',e=>{glow.style.left=e.clientX-40+'px';glow.style.top=e.clientY-40+'px'})
+
+  const cards = document.querySelectorAll('.card');
+  window.addEventListener('scroll', () => {
+    cards.forEach(card => {
+      if (card.getBoundingClientRect().top < window.innerHeight - 120) {
+        card.classList.add('show');
+      }
+    });
+  });
+
+  const modal = document.getElementById('modal');
+  const modalBox = document.getElementById('modalBox');
+
+  function openModal(type) {
+    modal.style.display = 'flex';
+    if (type === 'old') modalBox.innerHTML = `
+      <h2>Old Oxide Access</h2>
+      <p>650 Stars or <b>$20 Card</b></p>
+      <div class="cards-logos">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" />
+      </div>
+      <p>Message on Telegram: <b>miroslavkandic</b></p>`;
+
+    if (type === 'beta') modalBox.innerHTML = `<h2>Beta Oxide</h2><p>Free</p><p>Coming Soon</p>`;
+
+    if (type === 'bot') modalBox.innerHTML = `<h2>Telegram Bots</h2><p>200 Stars / $5 weekly</p><div class="cards-logos"><img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"></div><p>Custom design & features</p><p>Telegram: <b>miroslavkandic</b></p><p>Soon payments through website</p>`;
+
+    if (type === 'web') modalBox.innerHTML = `<h2>Rent Websites</h2><p>600 Stars or $10</p><p>Custom scripts & design</p><p>Telegram: <b>miroslavkandic</b></p>`;
+
+    if (type === 'dev') modalBox.innerHTML = `<h2>Rent Developer</h2><p>Message <b>miroslavkandic</b> on Telegram to discuss price</p>`;
+  }
+
+  modal.onclick = () => modal.style.display = 'none';
+
+// LOADER
+window.addEventListener('load',()=>{
+  const l=document.getElementById('loader');
+  setTimeout(()=>{l.style.opacity='0';l.style.pointerEvents='none';},600)
+});
+</script>
+</body>
+</html>
